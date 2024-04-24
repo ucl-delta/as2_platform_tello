@@ -16,6 +16,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    container:
+      image: ros2/humble
     steps:
       - name: echo distinct ID ${{ github.event.inputs.distinct_id }}
         run: |
