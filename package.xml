@@ -6,7 +6,6 @@
   <description>Package to communicate DJI Tello drones with Aerostack2 framework</description>
 
   <maintainer email="cvar.upm3@gmail.com">CVAR-UPM</maintainer>
-  <author>dani_sanchez</author>
 
   <license>BSD-3-Clause</license>
 
@@ -24,12 +23,11 @@
   <depend>tf2_ros</depend>
   <depend>eigen</depend>
   <exec_depend>rclpy</exec_depend>
-
   
+  <!-- linting test dependencies -->
   <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_cmake_clang_format</test_depend>
-  <test_depend>ament_cmake_cppcheck</test_depend>
-  <test_depend>ament_cmake_cpplint</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

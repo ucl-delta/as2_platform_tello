@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Simple UDP/IP client."""
+"""Test tello."""
 
 # Copyright 2024 Universidad Politécnica de Madrid
 #
@@ -35,22 +35,58 @@ __copyright__ = 'Copyright (c) 2022 Universidad Politécnica de Madrid'
 __license__ = 'BSD-3-Clause'
 __version__ = '0.1.0'
 
-import socket
-import time
+from time import sleep
 
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+from as2_python_api.drone_interface import DroneInterface
+import rclpy
 
-# Connect the socket to the port where the server is listening
-server_address = ('127.0.0.1', 8889)
 
-while True:
-    sock.sendto(bytes('command', encoding='utf-8'), server_address)
-    data, server = sock.recvfrom(1024)
-    if not data:
-        break
-    print(data)
-    time.sleep(0.1)
+def arm_test(uav: DroneInterface):
+    """Arm test."""
+    uav.offboard()
+    print('Offboard')
+    sleep(1)
 
-print('closing socket')
-sock.close()
+    uav.arm()
+    print('Armed')
+    sleep(1)
+
+
+def takeoff_land_test(uav: DroneInterface):
+    """Takeoff and land."""
+    uav.takeoff()
+    sleep(5)
+
+    uav.land()
+
+
+def command_pose_test(uav: DroneInterface):
+    """Pose test."""
+    uav.takeoff()
+    sleep(2)
+
+    uav.send_motion_reference_pose(position=[0, 0, 0.5])
+    sleep(5)
+
+    uav.send_motion_reference_pose(position=[0, 0, 1.0])
+    sleep(5)
+
+    uav.send_motion_reference_pose(position=[0, 0, 0.3])
+    sleep(5)
+    uav.land()
+
+
+if __name__ == '__main__':
+    rclpy.init()
+
+    drone_id = 'tello'
+    print('Connecting to: ', drone_id)
+    drone = DroneInterface(drone_id, True)
+
+    takeoff_land_test(drone)
+
+    drone.shutdown()
+
+    print('Bye')
+
+    rclpy.shutdown()
