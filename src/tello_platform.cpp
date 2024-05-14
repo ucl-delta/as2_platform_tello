@@ -43,7 +43,15 @@
 TelloPlatform::TelloPlatform()
 : as2::AerialPlatform()
 {
-  this->tello = std::make_unique<Tello>();
+
+  this->declare_parameter<std::string>("command_ip", "192.168.10.1");
+  this->declare_parameter<int>("command_port", 8889);
+  this->declare_parameter<std::string>("state_ip", "0.0.0.0");
+  this->declare_parameter<int>("state_port", 8890);
+
+  this->tello = std::make_unique<Tello>(
+    this->get_parameter("command_ip").as_string(), this->get_parameter("command_port").as_int(),
+    this->get_parameter("state_ip").as_string(), this->get_parameter("state_port").as_int());
   this->connected_ = this->tello->connect();
 
   this->declare_parameter<double>("minSpeed", 0.02);

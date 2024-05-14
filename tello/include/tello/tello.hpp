@@ -52,10 +52,10 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/imgcodecs.hpp"
 
-const int port_command = 8889;
-const int port_state = 8890;
+// const int port_command = 8889;
+// const int port_state = 8890;
 // const char* const IP_command{"127.0.0.1"};
-const char * const IP_command{"192.168.10.1"};
+// const char * const IP_command{"192.168.10.1"};
 const char * const URL_stream{"udp://0.0.0.0:11111"};
 
 struct coordinates
@@ -103,7 +103,10 @@ private:
   void threadStateFnc();
 
 public:
-  Tello();   // creating sockets
+  Tello(const std::string& command_ip="192.168.10.1", 
+        const int command_port=8889, 
+        const std::string& state_ip="0.0.0.0", 
+        const int state_port=8890);   // creating sockets
   ~Tello();  // closing sockets
 
   bool connect();
