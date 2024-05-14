@@ -47,6 +47,7 @@
 #include <utility>
 #include <vector>
 #include "socket_udp.hpp"
+#include "atomic"
 
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
@@ -76,7 +77,8 @@ private:
   std::unique_ptr<SocketUdp> stateRecv_;
 
   // State information.
-  bool connected_;
+  std::atomic<bool> connected_;
+  std::atomic<bool> streaming_;
 
   // std::array<double, 16> state_ = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   std::unordered_map<std::string, double> state_{
@@ -92,6 +94,9 @@ private:
   double timeOF;
   double height_;
   double barometer_;
+
+  double state_update_interval_;
+  double camera_update_interval_;
 
   std::array<coordinates, 3> imu_;
 
@@ -109,7 +114,7 @@ public:
         const int state_port=8890);   // creating sockets
   ~Tello();  // closing sockets
 
-  bool connect();
+  bool connect(const double state_update_rate=3.3);
 
   bool getState();
   // bool sendCommand(const std::string& command, bool wait = true);
@@ -153,6 +158,8 @@ public:
   }
   inline cv::Mat getFrame() {return frame_;}
 
+  void streamVideoStart(const double camera_update_rate=100.0);
+  void streamVideoStop();
   void streamVideo();
 
   bool x_motion(double x);                                     // Forward or backward move.

@@ -69,7 +69,7 @@ Tello::~Tello()
   std::cout << "Clean exit." << std::endl;
 }
 
-bool Tello::connect()
+bool Tello::connect(const double state_update_rate)
 {
   for (int i = 0; i < 3; ++i) {
     if (sendCommand("command")) {
@@ -86,8 +86,9 @@ bool Tello::connect()
   stateRecv_->bindServer();
   // update();
 
+  state_update_interval_ = 1.0 / state_update_rate;
   stateThd_ = std::thread(&Tello::threadStateFnc, this);
-  videoThd_ = std::thread(&Tello::streamVideo, this);
+  streamVideoStart();
   return connected_;
 }
 
@@ -113,7 +114,23 @@ void Tello::threadStateFnc()
 {
   while (connected_) {
     if (getState()) {update();}
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::duration<double>(state_update_interval_));
+  }
+}
+
+void Tello::streamVideoStart(const double camera_update_rate)
+{
+  camera_update_interval_ = 1.0 / camera_update_rate;
+  videoThd_ = std::thread(&Tello::streamVideo, this);
+}
+
+
+void Tello::streamVideoStop()
+{
+  bool response = sendCommand("streamoff");
+
+  if (response) {
+    streaming_ = false;
   }
 }
 
@@ -125,12 +142,14 @@ void Tello::streamVideo()
     cv::VideoCapture capture{URL_stream, cv::CAP_FFMPEG};
     cv::Mat frame;
 
-    while (connected_) {
+    streaming_ = true;
+
+    while (connected_ && streaming_) {
       capture >> frame;
       if (!frame.empty()) {
         frame_ = frame;
       }
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(std::chrono::duration<double>(camera_update_interval_));
     }
     capture.release();
   }

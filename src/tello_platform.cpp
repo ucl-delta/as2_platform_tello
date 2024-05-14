@@ -64,6 +64,8 @@ TelloPlatform::TelloPlatform()
   this->get_parameter("camera_freq", camera_freq_);
   this->declare_parameter<double>("sensor_freq", 10.0);
   this->get_parameter("sensor_freq", sensor_freq_);
+  this->declare_parameter<double>("odom_freq", 200.0);
+  this->get_parameter("sensor_freq", odom_freq_);
 
   odom_frame_id_ = as2::tf::generateTfName(this, "odom");
   base_link_frame_id_ = as2::tf::generateTfName(this, "base_link");
@@ -78,7 +80,7 @@ TelloPlatform::TelloPlatform()
     });
 
   static auto odom_timer = this->create_timer(
-    std::chrono::duration<double>(1.0f / 200.0f),
+    std::chrono::duration<double>(1.0f / odom_freq_),
     [this]() {recvOdometry();});
 
   static auto time_ping_timer = this->create_timer(
