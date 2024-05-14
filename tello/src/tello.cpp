@@ -118,8 +118,9 @@ void Tello::threadStateFnc()
   }
 }
 
-void Tello::streamVideoStart(const double camera_update_rate)
+void Tello::streamVideoStart(const double camera_update_rate, const std::string & stream_ip, const int stream_port)
 {
+  camera_stream_url_ = "udp://" + stream_ip + ":" + std::to_string(stream_port);
   camera_update_interval_ = 1.0 / camera_update_rate;
   videoThd_ = std::thread(&Tello::streamVideo, this);
 }
@@ -139,7 +140,7 @@ void Tello::streamVideo()
   bool response = sendCommand("streamon");
 
   if (response) {
-    cv::VideoCapture capture{URL_stream, cv::CAP_FFMPEG};
+    cv::VideoCapture capture{camera_stream_url_.c_str(), cv::CAP_FFMPEG};
     cv::Mat frame;
 
     streaming_ = true;

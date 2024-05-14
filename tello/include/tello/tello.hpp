@@ -57,7 +57,7 @@
 // const int port_state = 8890;
 // const char* const IP_command{"127.0.0.1"};
 // const char * const IP_command{"192.168.10.1"};
-const char * const URL_stream{"udp://0.0.0.0:11111"};
+// const char * const URL_stream{"udp://0.0.0.0:11111"};
 
 struct coordinates
 {
@@ -97,6 +97,7 @@ private:
 
   double state_update_interval_;
   double camera_update_interval_;
+  std::string camera_stream_url_;
 
   std::array<coordinates, 3> imu_;
 
@@ -158,7 +159,9 @@ public:
   }
   inline cv::Mat getFrame() {return frame_;}
 
-  void streamVideoStart(const double camera_update_rate=100.0);
+  void streamVideoStart(const double camera_update_rate=100.0,
+                        const std::string & stream_ip="0.0.0.0", 
+                        const int stream_port=11111);
   void streamVideoStop();
   void streamVideo();
 
