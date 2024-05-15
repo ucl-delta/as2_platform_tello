@@ -77,6 +77,8 @@ private:
   double camera_freq_;
   double sensor_freq_;
   double odom_freq_;
+  double tello_internal_state_update_freq_;
+  double tello_internal_camera_update_freq_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::shared_ptr<as2::sensors::Imu> imu_sensor_ptr_;
   std::shared_ptr<as2::sensors::Sensor<nav_msgs::msg::Odometry>> odometry_ptr_;
@@ -91,6 +93,8 @@ private:
   double max_speed_;
   const double max_linear_pose_ = 5;    // m
   const double min_linear_pose_ = 0.2;  // m
+
+  double height_delta = 0.0;
 
   std::vector<double> reference_point_ = {0.0, 0.0, 0.0, 0.0};  // x, y, z, yaw
   std::vector<double> reference_speed_ = {0.0, 0.0, 0.0, 0.0};  // vx, vy, vz, vyaw

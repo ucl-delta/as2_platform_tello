@@ -88,7 +88,7 @@ bool Tello::connect(const double state_update_rate)
 
   state_update_interval_ = 1.0 / state_update_rate;
   stateThd_ = std::thread(&Tello::threadStateFnc, this);
-  streamVideoStart();
+  // streamVideoStart();
   return connected_;
 }
 

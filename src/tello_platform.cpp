@@ -49,16 +49,10 @@ TelloPlatform::TelloPlatform()
   this->declare_parameter<std::string>("state_ip", "0.0.0.0");
   this->declare_parameter<int>("state_port", 8890);
 
-  this->tello = std::make_unique<Tello>(
-    this->get_parameter("command_ip").as_string(), this->get_parameter("command_port").as_int(),
-    this->get_parameter("state_ip").as_string(), this->get_parameter("state_port").as_int());
-  this->connected_ = this->tello->connect();
-
   this->declare_parameter<double>("minSpeed", 0.02);
   this->declare_parameter<double>("maxSpeed", 15.0);
   this->get_parameter("minSpeed", min_speed_);
   this->get_parameter("maxSpeed", max_speed_);
-  configureSensors();
 
   this->declare_parameter<double>("camera_freq", 30.0);
   this->get_parameter("camera_freq", camera_freq_);
@@ -66,6 +60,18 @@ TelloPlatform::TelloPlatform()
   this->get_parameter("sensor_freq", sensor_freq_);
   this->declare_parameter<double>("odom_freq", 200.0);
   this->get_parameter("sensor_freq", odom_freq_);
+
+  this->declare_parameter<double>("tello_internal_state_update_freq", 10.0);
+  this->get_parameter("tello_internal_state_update_freq", tello_internal_state_update_freq_);
+  this->declare_parameter<double>("tello_internal_camera_update_freq", 10.0);
+  this->get_parameter("tello_internal_camera_update_freq", tello_internal_camera_update_freq_);
+
+  this->tello = std::make_unique<Tello>(
+    this->get_parameter("command_ip").as_string(), this->get_parameter("command_port").as_int(),
+    this->get_parameter("state_ip").as_string(), this->get_parameter("state_port").as_int());
+  this->connected_ = this->tello->connect(tello_internal_state_update_freq_);
+
+  configureSensors();
 
   odom_frame_id_ = as2::tf::generateTfName(this, "odom");
   base_link_frame_id_ = as2::tf::generateTfName(this, "base_link");
@@ -391,7 +397,9 @@ void TelloPlatform::recvOdometry()
 void TelloPlatform::recvVideo()
 {
   cv::Mat frame = tello->getFrame();
-  camera_ptr_->updateData(frame);
+  if(!frame.empty()) {
+    camera_ptr_->updateData(frame);
+  }
 }
 
 // **********************************************************

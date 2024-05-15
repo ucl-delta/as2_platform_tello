@@ -115,7 +115,7 @@ public:
         const int state_port=8890);   // creating sockets
   ~Tello();  // closing sockets
 
-  bool connect(const double state_update_rate=3.3);
+  bool connect(const double state_update_rate=10);
 
   bool getState();
   // bool sendCommand(const std::string& command, bool wait = true);

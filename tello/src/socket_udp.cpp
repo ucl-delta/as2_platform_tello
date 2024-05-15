@@ -39,9 +39,9 @@
 SocketUdp::SocketUdp(const std::string & host, int port, uint bufferSize)
 {
   (void)bufferSize;
-  std::cout << "Creating socket ..." << std::endl;
   host_ = host;
   port_ = port;
+  std::cout << "Creating socket ... " << host_ << ":" << port_ << std::endl;
 
   /* socket: create the socket */
   socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
