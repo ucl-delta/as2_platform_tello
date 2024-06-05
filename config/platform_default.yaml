@@ -1,7 +1,16 @@
 /**:
   ros__parameters:
-    cmd_freq: 100.0  # Hz of platform commands send
+    cmd_freq: 10.0  # Hz of platform commands send
     info_freq: 10.0  # Hz of platform info publish
-    sensor_freq: 10.0  # Hz of platform sensor publish
-    camera_freq: 30.0  # Hz of platform camera publish
+    ping_freq: 0.5  # Hz of platform ping
+    state_freq: 10.0  # Hz of tello state receive
+    tello_ip: "192.168.10.1" # IP of platform command
+    port_command: 8889  # Port of platform command
+    port_state: 8890  # Port of tello
+    tello_state_topic: "_tello_state"  # Topic of tello state for debug
+    camera: # Camera configuration
+      enabled: false  # Enable camera
+      freq: 30.0  # Hz of platform camera publish
+      stream_url: "udp://0.0.0.0:11111" # URL of video stream
+    tf_timeout_threshold: 0.5  # Threshold of tf timeout in seconds
     
