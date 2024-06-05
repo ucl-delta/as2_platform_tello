@@ -110,7 +110,7 @@ TelloPlatform::TelloPlatform(const rclcpp::NodeOptions & options)
   if (enable_video_stream) {
     double camera_freq;
     this->declare_parameter<double>("camera.freq", 10.0);
-    this->get_parameter("camera_freq", camera_freq);
+    this->get_parameter("camera.freq", camera_freq);
     video_stream_timer_ = this->create_timer(
       std::chrono::duration<double>(1.0 / camera_freq),
       std::bind(&TelloPlatform::readCameraTimerCallback, this));

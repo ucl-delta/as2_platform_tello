@@ -9,7 +9,7 @@
     port_state: 8890  # Port of tello
     tello_state_topic: "_tello_state"  # Topic of tello state for debug
     camera: # Camera configuration
-      enabled: false  # Enable camera
+      enable: true  # Enable camera
       freq: 30.0  # Hz of platform camera publish
       stream_url: "udp://0.0.0.0:11111" # URL of video stream
     tf_timeout_threshold: 0.5  # Threshold of tf timeout in seconds

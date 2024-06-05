@@ -84,7 +84,7 @@ void spinForTime(
     executor.spin_some();
 
     // Print state
-    // test_node->printState(seconds * 0.5);
+    test_node->printState(seconds * 0.5);
 
     // Sleep for 10 ms
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -100,7 +100,7 @@ void spinForTime(
   auto start_time = test_node->getTime();
   while ((test_node->getTime() - start_time).seconds() < seconds) {
     // Print state
-    // test_node->printState(seconds * 0.5);
+    test_node->printState(seconds * 0.5);
 
     // Sleep for 10 ms
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
