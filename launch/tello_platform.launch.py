@@ -31,7 +31,7 @@
 
 """Launch DJI Tello platform node."""
 
-__authors__ = 'Daniel Fernández Sánchez'
+__authors__ = 'Daniel Fernández Sánchez, Rafael Perez-Segui'
 __copyright__ = 'Copyright (c) 2022 Universidad Politécnica de Madrid'
 __license__ = 'BSD-3-Clause'
 __version__ = '0.1.0'

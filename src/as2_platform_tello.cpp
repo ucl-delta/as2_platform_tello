@@ -409,9 +409,18 @@ double TelloPlatform::getSpeedLimit()
 
 void TelloPlatform::clampSpeed(double & vx, double & vy, double & vz)
 {
-  vx = limitSeed(vx, -command_twist_msg_.twist.linear.x, command_twist_msg_.twist.linear.x);
-  vy = limitSeed(vy, -command_twist_msg_.twist.linear.y, command_twist_msg_.twist.linear.y);
-  vz = limitSeed(vz, -command_twist_msg_.twist.linear.z, command_twist_msg_.twist.linear.z);
+  vx =
+    limitSeed(
+    vx, -std::abs(command_twist_msg_.twist.linear.x),
+    std::abs(command_twist_msg_.twist.linear.x));
+  vy =
+    limitSeed(
+    vy, -std::abs(command_twist_msg_.twist.linear.y),
+    std::abs(command_twist_msg_.twist.linear.y));
+  vz =
+    limitSeed(
+    vz, -std::abs(command_twist_msg_.twist.linear.z),
+    std::abs(command_twist_msg_.twist.linear.z));
   return;
 }
 

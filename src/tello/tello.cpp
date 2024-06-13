@@ -187,12 +187,7 @@ TelloCommandSender::TelloCommandSender(
   if (!askSDKVersion(tello_version_response)) {
     throw std::runtime_error("Error: Getting SDK version");
   }
-  if (tello_version_response.find("ok") != std::string::npos) {
-    tello_version_ = tello_version_response;
-  } else {
-    // Default version
-    tello_version_ = "v1.3";
-  }
+  tello_version_ = tello_version_response;
 }
 
 TelloCommandSender::~TelloCommandSender()
@@ -267,12 +262,13 @@ bool TelloCommandSender::speedMotionCommand(
   int x_cm = static_cast<int>(x * 100);
   int y_cm = static_cast<int>(y * 100);
   int z_cm = static_cast<int>(z * 100);
-  int yaw_deg = static_cast<int>(yaw * 180.0 / M_PI);
+  // TODO(RPS98): Convert from max yaw speed of tello to rad/s
+  int yaw_deg = static_cast<int>(yaw * 100);
 
   x_cm = std::clamp(x_cm, -100, 100);
-  y_cm = std::clamp(y_cm, -100, 100);
+  y_cm = std::clamp(-y_cm, -100, 100);
   z_cm = std::clamp(z_cm, -100, 100);
-  yaw_deg = std::clamp(yaw_deg, -100, 100);
+  yaw_deg = std::clamp(-yaw_deg, -100, 100);
 
   std::string msg = "rc " + std::to_string(y_cm) + " " + std::to_string(x_cm) + " " +
     std::to_string(z_cm) + " " + std::to_string(yaw_deg);
@@ -334,7 +330,9 @@ TelloCameraManager::TelloCameraManager(
   const std::string & stream_url)
 : tello_command_sender_(tello_command_sender)
 {
-  setVideoStream(true, stream_url);
+  if (!setVideoStream(true, stream_url)) {
+    std::cerr << "Failed to initialize video stream" << std::endl;
+  }
 }
 
 TelloCameraManager::~TelloCameraManager()
@@ -358,17 +356,28 @@ bool TelloCameraManager::setVideoStream(
   bool response = tello_command_sender_->sendCameraCommand(true);
 
   if (response) {
-    video_stream_capture_ = cv::VideoCapture{stream_url, cv::CAP_FFMPEG};
+    video_stream_capture_.open(stream_url, cv::CAP_FFMPEG);
+    if (!video_stream_capture_.isOpened()) {
+      std::cerr << "Failed to open video stream: " << stream_url << std::endl;
+      camera_enabled_ = false;
+      return false;
+    }
     camera_enabled_ = true;
     video_stream_frame_ = cv::Mat();
+  } else {
+    std::cerr << "Failed to send camera command" << std::endl;
   }
   return response;
 }
 
 const cv::Mat & TelloCameraManager::getFrame()
 {
-  video_stream_capture_ >> video_stream_frame_;
+  if (camera_enabled_) {
+    video_stream_capture_ >> video_stream_frame_;
+    if (video_stream_frame_.empty()) {
+      std::cerr << "Failed to capture frame" << std::endl;
+    }
+  }
   return video_stream_frame_;
 }
-
 }  // namespace tello
