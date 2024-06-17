@@ -143,9 +143,9 @@ int platform_test()
   desired_control_mode.control_mode = as2_msgs::msg::ControlMode::SPEED;
   desired_control_mode.yaw_mode = as2_msgs::msg::ControlMode::YAW_SPEED;
   desired_control_mode.reference_frame = as2_msgs::msg::ControlMode::LOCAL_ENU_FRAME;
-  auto control_mode_future = test_node->setControlMode(desired_control_mode);
-  control_mode_future.wait();
-  if (!control_mode_future.get()->success) {return 1;}
+  if (!test_node->setControlMode(desired_control_mode, false)) {
+    return 1;
+  }
 
   // Send command
   RCLCPP_INFO(test_node->get_logger(), "Sending command");
@@ -180,9 +180,9 @@ int platform_test()
   desired_hover_control_mode.control_mode = as2_msgs::msg::ControlMode::HOVER;
   desired_hover_control_mode.yaw_mode = as2_msgs::msg::ControlMode::UNSET;
   desired_hover_control_mode.reference_frame = as2_msgs::msg::ControlMode::UNSET;
-  auto hover_control_mode_future = test_node->setControlMode(desired_hover_control_mode);
-  hover_control_mode_future.wait();
-  if (!hover_control_mode_future.get()->success) {return 1;}
+  if (!test_node->setControlMode(desired_hover_control_mode, false)) {
+    return 1;
+  }
   spinForTime(2.0, test_node);
 
   // Land
