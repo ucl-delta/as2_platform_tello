@@ -46,6 +46,7 @@ TelloPlatform::TelloPlatform()
 
   this->declare_parameter<std::string>("command_ip", "192.168.10.1");
   this->declare_parameter<int>("command_port", 8889);
+  this->declare_parameter<int>("local_command_port", 30000);
   this->declare_parameter<std::string>("state_ip", "0.0.0.0");
   this->declare_parameter<int>("state_port", 8890);
 
@@ -68,6 +69,7 @@ TelloPlatform::TelloPlatform()
 
   this->tello = std::make_unique<Tello>(
     this->get_parameter("command_ip").as_string(), this->get_parameter("command_port").as_int(),
+    this->get_parameter("local_command_port").as_int(),
     this->get_parameter("state_ip").as_string(), this->get_parameter("state_port").as_int());
   this->connected_ = this->tello->connect(tello_internal_state_update_freq_);
 

@@ -36,12 +36,23 @@
 
 #include "socket_udp.hpp"
 
-SocketUdp::SocketUdp(const std::string & host, int port, uint bufferSize)
+// Custom exception class for socket errors
+class SocketException : public std::runtime_error {
+public:
+    SocketException(const std::string& message) : std::runtime_error(message) {}
+};
+
+SocketUdp::SocketUdp(const std::string & host, int port, int local_port, uint bufferSize)
 {
   (void)bufferSize;
   host_ = host;
   port_ = port;
-  std::cout << "Creating socket ... " << host_ << ":" << port_ << std::endl;
+  std::cout << "Creating socket ... " << host_ << ":" << port_;
+  if(local_port != 0) {
+    std::cout << " <- '':" << local_port << std::endl;
+  } else {
+    std::cout << std::endl;
+  }
 
   /* socket: create the socket */
   socket_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
@@ -59,6 +70,19 @@ SocketUdp::SocketUdp(const std::string & host, int port, uint bufferSize)
   serv_addr_.sin_port = htons(port_);
   serv_addr_.sin_addr.s_addr = inet_addr(host_.c_str());
   serv_addr_.sin_family = AF_INET;
+
+  if(local_port != 0) {
+    // Set up the local address and port
+    local_addr_.sin_family = AF_INET;
+    local_addr_.sin_addr.s_addr = INADDR_ANY;  // Bind to any local address
+    local_addr_.sin_port = htons(local_port);       // Local port to send from
+
+    // Bind the socket to the local address and port
+    if (bind(socket_fd_, (const struct sockaddr *)&local_addr_, sizeof(local_addr_)) < 0) {
+        close(socket_fd_);
+        throw SocketException("Bind failed: " + std::string(strerror(errno)));
+    }
+  }
 
   /* build the sending destination addres */
   if (!setDestAddr()) {

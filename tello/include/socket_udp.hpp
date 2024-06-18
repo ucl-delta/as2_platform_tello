@@ -63,6 +63,7 @@ private:
   int port_;
 
   sockaddr_in serv_addr_;
+  sockaddr_in local_addr_;
   std::array<unsigned char, 1024> buffer_;
   sockaddr_storage dest_addr_;
 
@@ -70,7 +71,7 @@ private:
   bool setDestAddr();
 
 public:
-  explicit SocketUdp(const std::string & host = "0.0.0.0", int port = 0, uint bufferSize = 1024);
+  explicit SocketUdp(const std::string & host = "0.0.0.0", int port = 0, int local_port = 0, uint bufferSize = 1024);
   ~SocketUdp();  // closing socket
 
   bool bindServer();

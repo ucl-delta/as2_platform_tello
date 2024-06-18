@@ -111,6 +111,7 @@ private:
 public:
   Tello(const std::string& command_ip="192.168.10.1", 
         const int command_port=8889, 
+        const int local_command_port=30000,
         const std::string& state_ip="0.0.0.0", 
         const int state_port=8890);   // creating sockets
   ~Tello();  // closing sockets

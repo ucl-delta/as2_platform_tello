@@ -50,10 +50,10 @@ static std::vector<std::string> split(const std::string & target, char c)
   return result;
 }
 
-Tello::Tello(const std::string& command_ip, const int command_port, 
+Tello::Tello(const std::string& command_ip, const int command_port, const int local_command_port,
              const std::string& state_ip, const int state_port)
 {
-  commandSender_ = std::make_unique<SocketUdp>(command_ip, command_port);
+  commandSender_ = std::make_unique<SocketUdp>(command_ip, command_port, local_command_port);
   stateRecv_ = std::make_unique<SocketUdp>(state_ip, state_port);
 }
 
