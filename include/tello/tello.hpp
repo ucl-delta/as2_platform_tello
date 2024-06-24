@@ -160,7 +160,8 @@ public:
   */
   TelloCommandSender(
     const std::string & tello_ip,
-    const int port_state = 8890);
+    const int port_command = 8890,
+    const int port_command_client = 8890);
 
   /**
    * @brief Destroy the TelloCommandSender object
@@ -189,6 +190,15 @@ public:
    * @return true if the command was sent
   */
   bool entrySDKMode();
+
+  /**
+   * @brief Set State and Camera Stream Ports
+   * 
+   * @return true if command was sent
+   */
+  bool setPort(
+    const int port_state = 8890, 
+    const int port_camera = 11111);
 
   /**
    * @brief Takeoff the tello drone

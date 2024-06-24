@@ -172,10 +172,10 @@ bool TelloStateReceiver::parseState(const std::string & data)
 }
 
 TelloCommandSender::TelloCommandSender(
-  const std::string & tello_ip, const int port_command)
+  const std::string & tello_ip, const int port_command, const int port_command_client)
 {
   // Create UDP socket to send commands
-  udp_socket_command_ = std::make_unique<SocketUDP>(tello_ip, port_command, port_command);
+  udp_socket_command_ = std::make_unique<SocketUDP>(tello_ip, port_command_client, port_command);
 
   // Send command to enter SDK mode
   if (!entrySDKMode()) {
@@ -209,6 +209,11 @@ bool TelloCommandSender::getTime(std::string & response)
 bool TelloCommandSender::entrySDKMode()
 {
   return sendControlCommand("command");
+}
+
+bool TelloCommandSender::setPort(const int port_state, const int port_camera)
+{
+  return sendControlCommand("port " + std::to_string(port_state) + " " + std::to_string(port_camera));
 }
 
 bool TelloCommandSender::takeoff()

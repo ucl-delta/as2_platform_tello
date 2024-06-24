@@ -61,24 +61,30 @@ TelloPlatform::TelloPlatform(const rclcpp::NodeOptions & options)
 {
   // Get Tello parameters
   std::string tello_ip;
-  int port_command, port_state;
+  int port_command, port_command_client, port_state;
   this->declare_parameter<std::string>("tello_ip", "192.168.10.1");
   this->declare_parameter<int>("port_command", 8889);
+  this->declare_parameter<int>("port_command_client", 8889);
   this->declare_parameter<int>("port_state", 8890);
   this->get_parameter("tello_ip", tello_ip);
   this->get_parameter("port_command", port_command);
+  this->get_parameter("port_command_client", port_command_client);
   this->get_parameter("port_state", port_state);
 
   // Connect to Tello
-  RCLCPP_INFO(this->get_logger(), "Connecting to Tello at %s:%d", tello_ip.c_str(), port_command);
+  RCLCPP_INFO(this->get_logger(), "Connecting to Tello at %s:%d -> :%d", tello_ip.c_str(), port_command, port_command_client);
   tello_command_sender_ptr_ = std::make_shared<tello::TelloCommandSender>(
-    tello_ip, port_command);
+    tello_ip, port_command, port_command_client);
   tello_state_receiver_ptr_ = std::make_unique<tello::TelloStateReceiver>(
     "0.0.0.0", port_state);
 
   RCLCPP_INFO(
     this->get_logger(), "Tello SDK version: %s",
     tello_command_sender_ptr_->getSDKVersion().c_str());
+
+  // Set State Ports
+  tello_command_sender_ptr_->setPort(port_state);
+  RCLCPP_INFO(this->get_logger(), "Reading Tello State from :%d", port_state);
 
   // Get tf timeout
   double tf_timeout_threshold;
@@ -119,12 +125,29 @@ TelloPlatform::TelloPlatform(const rclcpp::NodeOptions & options)
     camera_ptr_ = std::make_shared<as2::sensors::Camera>("camera", this);
     // TODO(RPS98): fill camera info and transform
     sensor_msgs::msg::CameraInfo cam_info;
+    cam_info.height = 720;
+    cam_info.width = 960;
+    cam_info.distortion_model = "plumb_bob";
+    cam_info.d = {-0.041948, 0.048619, -0.022789, -0.004038, 0.000000};
+    cam_info.k = {919.424717, 0.000000, 459.655779, 0.000000, 911.926190, 323.551997, 0.000000, 0.000000, 1.000000};
+    cam_info.r = {1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000};
+    cam_info.p = {924.081787, 0.000000, 455.713683, 0.000000, 0.000000, 904.971619, 310.291689, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000};
     camera_ptr_->setParameters(cam_info, "bgr8");
 
     // Enable video stream
-    std::string stream_url;
-    this->declare_parameter<std::string>("camera.stream_url", "udp://0.0.0.0:11111");
-    this->get_parameter("camera.stream_url", stream_url);
+    std::string stream_ip;
+    uint16_t stream_port;
+    this->declare_parameter<std::string>("camera.stream_ip", "0.0.0.0");
+    this->declare_parameter<uint16_t>("camera.stream_port", 11111);
+    this->get_parameter("camera.stream_ip", stream_ip);
+    this->get_parameter("camera.stream_port", stream_port);
+
+    std::string stream_url = "udp://" + stream_ip + ":" + std::to_string(stream_port); 
+
+    // Set State Ports
+    tello_command_sender_ptr_->setPort(port_state, stream_port);
+    RCLCPP_INFO(this->get_logger(), "Reading Camera Stream Port from %s", stream_url.c_str());
+    
     tello_camera_manager_ptr_ = std::make_unique<tello::TelloCameraManager>(
       tello_command_sender_ptr_, stream_url);
   }
